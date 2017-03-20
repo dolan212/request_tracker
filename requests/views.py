@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views import generic
@@ -34,3 +34,8 @@ class LoginView(View):
 
             else: return render(request, self.template_name, {'form': form, 'error': 'Invalid username or password'})
         else: return render(request, self.template_name, {'form': form})
+
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('requests:login')

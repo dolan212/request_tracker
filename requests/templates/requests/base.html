@@ -34,8 +34,18 @@
 
          <ul class="nav navbar-nav navbar-right">
 
+             {% if user.is_staff %}
              <li>
-                 <a href=""
+                 <a href="{% url 'admin:index' %}">
+                     <span class="glyphicon glyphicon-console"></span>Admin Panel
+                 </a>
+             </li>
+             {% endif %}
+
+             <li>
+                 <a href="{% url 'requests:logout' %}">
+                     <span class="glyphicon glyphicon-off"></span>Logout
+                 </a>
              </li>
 
          </ul>
