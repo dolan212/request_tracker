@@ -1,5 +1,8 @@
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.urls import resolve
 from django.urls import reverse
+from os import path
 
 
 class AuthRequiredMiddleware(object):
@@ -7,6 +10,9 @@ class AuthRequiredMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
+        current_url = resolve(request.path_info).url_name
         if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('requests:login'))
-        return None
+            if current_url is not 'login':
+                return redirect('requests:login')
+
+        return self.get_response(request);
