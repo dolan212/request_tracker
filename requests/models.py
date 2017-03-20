@@ -5,21 +5,12 @@ from django.db import models
 
 class Queue(models.Model):
     name = models.CharField(max_length=50)
+    workers = models.ManyToManyField(User, related_name='work_queues', null=True, blank=True)
+    creators = models.ManyToManyField(User, related_name='create_queues', null=True, blank=True)
     everybody = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
-
-class Worker(models.Model):
-    queue = models.ForeignKey(Queue, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.user.username + " works on " + self.queue.name
-
-class Creator(models.Model):
-    queue = models.ForeignKey(Queue, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 status_choices = (
         ('N', 'New'),

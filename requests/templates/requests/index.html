@@ -3,5 +3,31 @@
 
 
 {% block body %}
-    <h1>Welcome, {{ user.username }}</h1>
+    <h1 align="center">Your Queues</h1>
+    <div class="row" align="center">
+        {% for queue in all_queues %}
+            <div class="col-sm-4 col-md-3">
+                <a href="#" class="queue">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h1 align="center">{{ queue }}</h1>
+                        </div>
+
+                        {% if user.is_staff %}
+                            <div class="panel-footer" align="center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-danger">
+                                        <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
+                                    </button><button type="button" class="btn btn-info">
+                                        <span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

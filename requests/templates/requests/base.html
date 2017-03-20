@@ -29,22 +29,38 @@
 
       <div class="collapse navbar-collapse" id="topNavBar">
          <ul class="nav navbar-nav">
+             <li class="{% block yours %}{% endblock %}">
+                 <a href="{% url 'requests:tickets' %}">
+                     <span class="glyphicon glyphicon-tag"></span>&nbsp;Your Tickets
+                 </a>
+             </li>
+             <li class="{% block work %}{% endblock %}">
+                <a href="{% url 'requests:work' %}">
+                    <span class="glyphicon glyphicon-wrench"></span>&nbsp;Tickets In Your Queues
+                </a>
+             </li>
 
          </ul>
 
          <ul class="nav navbar-nav navbar-right">
 
+             <li>
+                 <a href="#">
+                     <span class="glyphicon glyphicon-plus"></span>&nbsp;Create Ticket
+                 </a>
+             </li>
+
              {% if user.is_staff %}
              <li>
                  <a href="{% url 'admin:index' %}">
-                     <span class="glyphicon glyphicon-console"></span>Admin Panel
+                     <span class="glyphicon glyphicon-console"></span>&nbsp;Admin Panel
                  </a>
              </li>
              {% endif %}
 
              <li>
                  <a href="{% url 'requests:logout' %}">
-                     <span class="glyphicon glyphicon-off"></span>Logout
+                     <span class="glyphicon glyphicon-off"></span>&nbsp;Logout
                  </a>
              </li>
 

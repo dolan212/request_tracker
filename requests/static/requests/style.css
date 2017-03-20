@@ -14,3 +14,7 @@
 .navbar {
     border-radius: 0;
 }
+
+.queue:hover {
+    text-decoration: none;
+}
