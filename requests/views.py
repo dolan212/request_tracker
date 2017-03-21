@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views import generic
 
-from requests.forms import UserForm
+from requests.forms import UserForm, AddTicketForm
 from requests.models import Queue
 
 
@@ -44,6 +44,7 @@ class LoginView(View):
                 if user.is_active:
                     login(request, user)
                     return redirect('requests:index')
+                else: return render(request, self.template_name, {'form': form, 'error': 'Your account has been disabled'})
 
             else: return render(request, self.template_name, {'form': form, 'error': 'Invalid username or password'})
         else: return render(request, self.template_name, {'form': form})
@@ -59,4 +60,35 @@ class TicketView(generic.TemplateView):
 class WorkView(generic.ListView):
     template_name = 'requests/work.html'
     context_object_name = 'queues';
+
+    def get_queryset(self):
+        user = User.objects.get(pk=self.request.user.id)
+        users_queues = user.work_queues.all();
+        if user.is_staff: users_queues = Queue.objects.all()
+        return users_queues;
+
+
+class AddView(generic.FormView):
+    form_class = AddTicketForm
+    template_name = 'requests/addticket.html'
+
+    def get(self, request):
+        everyone = Queue.objects.filter(everybody=True)
+        user = User.objects.get(pk=self.request.user.id)
+        users_queues = user.create_queues.all();
+        #if user.is_staff: users_queues = Queue.objects.all()
+        #result_list = queryset(everyone) + list(set(users_queues) - set(everyone))
+
+        form = self.form_class(qset=users_queues)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        everyone = Queue.objects.filter(everybody=True)
+        user = User.objects.get(pk=self.request.user.id)
+        users_queues = user.create_queues.all();
+        #if user.is_staff: users_queues = Queue.objects.all()
+        #result_list = queryset(everyone) + list(set(users_queues) - set(everyone))
+
+        form = self.form_class(qset=users_queues, data=request.POST)
+
 

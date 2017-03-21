@@ -3,6 +3,20 @@
 {% block work %}active{% endblock %}
 
 {% block body %}
-<h1>Your Work</h1>
+    <h1>Your Work</h1>
+
+    <ul class="nav nav-tabs">
+        {% for  queue in queues %}
+            <li><a data-toggle="tab" href="#{{ forloop.counter0 }}">{{ queue.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+        {% for queue in queues %}
+            <div id="{{ forloop.counter0 }}" class="tab-pane fade in">
+                <h1>Placeholder {{ forloop.counter0 }}</h1>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}

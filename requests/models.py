@@ -5,8 +5,8 @@ from django.db import models
 
 class Queue(models.Model):
     name = models.CharField(max_length=50)
-    workers = models.ManyToManyField(User, related_name='work_queues', null=True, blank=True)
-    creators = models.ManyToManyField(User, related_name='create_queues', null=True, blank=True)
+    workers = models.ManyToManyField(User, related_name='work_queues', blank=True)
+    creators = models.ManyToManyField(User, related_name='create_queues', blank=True)
     everybody = models.BooleanField(default=False)
 
     def __str__(self):

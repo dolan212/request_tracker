@@ -14,4 +14,7 @@ urlpatterns = [
     #user's tickets to be worked on
     url(r'^work/$', views.WorkView.as_view(), name='work'),
 
+    #create a ticket
+    url(r'^addticket/$', views.AddView.as_view(), name='addticket')
+
 ]
