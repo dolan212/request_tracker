@@ -28,6 +28,9 @@ class Ticket(models.Model):
 
     status = models.CharField(max_length=10, choices=status_choices, default='N')
 
+    def __str__(self):
+        return self.creator.username + ": " + self.subject
+
 class Update(models.Model):
     time = models.DateTimeField(auto_now=True)
     comment = models.CharField(max_length=500)

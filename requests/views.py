@@ -7,7 +7,7 @@ from django.views import View
 from django.views import generic
 
 from requests.forms import UserForm, AddTicketForm
-from requests.models import Queue
+from requests.models import Queue, Ticket
 
 
 class IndexView(generic.ListView):
@@ -54,18 +54,23 @@ class LogoutView(View):
         logout(request)
         return redirect('requests:login')
 
-class TicketView(generic.TemplateView):
+class TicketView(generic.ListView):
     template_name = 'requests/tickets.html'
+    context_object_name = 'tickets'
+
+    def get_queryset(self):
+        users_tickets = self.request.user.created_tickets.all()
+        return users_tickets
 
 class WorkView(generic.ListView):
     template_name = 'requests/work.html'
-    context_object_name = 'queues';
+    context_object_name = 'queues'
 
     def get_queryset(self):
         user = User.objects.get(pk=self.request.user.id)
-        users_queues = user.work_queues.all();
+        users_queues = user.work_queues.all()
         if user.is_staff: users_queues = Queue.objects.all()
-        return users_queues;
+        return users_queues
 
 
 class AddView(generic.FormView):
@@ -76,7 +81,7 @@ class AddView(generic.FormView):
         everyone = Queue.objects.filter(everybody=True)
         user = User.objects.get(pk=self.request.user.id)
         users_queues = user.create_queues.all();
-        #if user.is_staff: users_queues = Queue.objects.all()
+        if user.is_staff: users_queues = Queue.objects.all()
         #result_list = queryset(everyone) + list(set(users_queues) - set(everyone))
 
         form = self.form_class(qset=users_queues)
@@ -86,9 +91,23 @@ class AddView(generic.FormView):
         everyone = Queue.objects.filter(everybody=True)
         user = User.objects.get(pk=self.request.user.id)
         users_queues = user.create_queues.all();
-        #if user.is_staff: users_queues = Queue.objects.all()
+        if user.is_staff: users_queues = Queue.objects.all()
         #result_list = queryset(everyone) + list(set(users_queues) - set(everyone))
 
         form = self.form_class(qset=users_queues, data=request.POST)
 
+        if(form.is_valid()):
+            ticket = form.save(commit=False)
+            ticket.creator = User.objects.get(pk=request.user.id)
 
+            ticket.save()
+
+            return redirect('requests:tickets')
+
+        return render(request, self.template_name, {'form': form})
+
+
+
+class TicketDetailView(generic.DetailView):
+    model = Ticket
+    template_name = 'requests/ticket_view.html'
