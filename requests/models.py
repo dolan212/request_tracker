@@ -31,8 +31,42 @@ class Ticket(models.Model):
     def __str__(self):
         return self.creator.username + ": " + self.subject
 
+
+    def get_lbtype(self):
+        if self.status == 'N':
+            return 'success'
+        else:
+            if self.status == 'O':
+                return 'info'
+            else:
+                if self.status == 'A':
+                    return 'primary'
+                else:
+                    if self.status == 'C':
+                        return 'default'
+
 class Update(models.Model):
     time = models.DateTimeField(auto_now=True)
     comment = models.CharField(max_length=500)
-    status = models.CharField(max_length=1, choices=status_choices)
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    status = models.CharField(max_length=1, choices=status_choices, blank=True)
+    ticket = models.ForeignKey(Ticket, related_name='updates', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True)
+
+    class Meta:
+        ordering = ['-time']
+
+    def __str__(self):
+        return self.user.username + " " + self.time.__str__()
+
+    def get_lbtype(self):
+        if self.status == 'N':
+            return 'success'
+        else:
+            if self.status == 'O':
+                return 'info'
+            else:
+                if self.status == 'A':
+                    return 'primary'
+                else:
+                    if self.status == 'C':
+                        return 'default'

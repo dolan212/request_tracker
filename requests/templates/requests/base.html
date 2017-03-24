@@ -24,19 +24,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'requests:index' %}">Requests</a>
+        <a class="navbar-brand" href="{% url 'requests:index' %}">Request Tracking System</a>
       </div>
 
       <div class="collapse navbar-collapse" id="topNavBar">
          <ul class="nav navbar-nav">
              <li class="{% block yours %}{% endblock %}">
                  <a href="{% url 'requests:tickets' %}">
-                     <span class="glyphicon glyphicon-tag"></span>&nbsp;Your Tickets
+                     <span class="glyphicon glyphicon-tag"></span>&nbsp;Your Created Tickets
                  </a>
              </li>
              <li class="{% block work %}{% endblock %}">
                 <a href="{% url 'requests:work' %}">
-                    <span class="glyphicon glyphicon-wrench"></span>&nbsp;Tickets In Your Queues
+                    <span class="glyphicon glyphicon-wrench"></span>&nbsp;Tickets In Your Work Queues
                 </a>
              </li>
 
@@ -71,8 +71,10 @@
     </div>
   </nav>
 
+  <div class="container-fluid">
   {% block body %}
   {% endblock %}
+  </div>
 
 </body>
 

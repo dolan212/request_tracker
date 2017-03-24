@@ -1,0 +1,24 @@
+<div class="col-md-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <strong>{{ ticket.creator }}</strong>
+            <span style="float:right;">
+                <span class="label label-{{ ticket.get_lbtype }}">{{ ticket.get_status_display }}</span>
+                {{ ticket.time }}
+            </span>
+        </div>
+
+        <div class="panel-body">
+            <h3>{{ ticket.subject }}</h3>
+            <p>{{ ticket.description }}</p>
+        </div>
+
+        <div class="panel-footer" style="text-align: right;">
+            <a href="{% url 'requests:viewticket' ticket.id %}">
+                <button class="btn btn-primary">
+                    View Ticket >>
+                </button>
+            </a>
+        </div>
+    </div>
+</div>

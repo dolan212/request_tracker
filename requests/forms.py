@@ -3,7 +3,7 @@
 from django.contrib.auth.models import User
 from django import forms
 
-from requests.models import Ticket
+from requests.models import Ticket, Update
 
 
 class UserForm(forms.Form):
@@ -26,3 +26,11 @@ class AddTicketForm(forms.ModelForm):
         qset = kwargs.pop('qset')
         super(AddTicketForm, self).__init__(*args, **kwargs)
         self.fields['queue'].queryset = qset
+
+
+class UpdateForm(forms.ModelForm):
+    comment = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Comment', 'style': 'width: 100%; height: 100px;'}))
+
+    class Meta:
+        model = Update
+        fields = ['comment', 'status']

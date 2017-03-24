@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views import generic
 
-from requests.forms import UserForm, AddTicketForm
+from requests.forms import UserForm, AddTicketForm, UpdateForm
 from requests.models import Queue, Ticket
 
 
@@ -79,8 +79,8 @@ class AddView(generic.FormView):
 
     def get(self, request):
         everyone = Queue.objects.filter(everybody=True)
-        user = User.objects.get(pk=self.request.user.id)
-        users_queues = user.create_queues.all();
+        user = self.request.user
+        users_queues = user.create_queues.all() | everyone
         if user.is_staff: users_queues = Queue.objects.all()
         #result_list = queryset(everyone) + list(set(users_queues) - set(everyone))
 
@@ -89,8 +89,8 @@ class AddView(generic.FormView):
 
     def post(self, request):
         everyone = Queue.objects.filter(everybody=True)
-        user = User.objects.get(pk=self.request.user.id)
-        users_queues = user.create_queues.all();
+        user = self.request.user
+        users_queues = user.create_queues.all() | everyone
         if user.is_staff: users_queues = Queue.objects.all()
         #result_list = queryset(everyone) + list(set(users_queues) - set(everyone))
 
@@ -110,4 +110,36 @@ class AddView(generic.FormView):
 
 class TicketDetailView(generic.DetailView):
     model = Ticket
+    form_class = UpdateForm
     template_name = 'requests/ticket_view.html'
+
+    def get(self, request, pk):
+        ticket = Ticket.objects.get(pk=pk)
+        if(ticket.status == 'N'):
+            ticket.status = 'O'
+            ticket.save()
+
+        form = self.form_class(None)
+
+        return render(request, self.template_name, {'ticket': ticket, 'form' : form})
+
+    def post(self, request, pk):
+        ticket = Ticket.objects.get(pk=pk)
+        user = request.user
+        form = self.form_class(request.POST)
+
+        if(form.is_valid()):
+            update = form.save(commit=False)
+            update.user = user;
+            update.ticket = ticket;
+
+            if not form.data['status']:
+                update.status = ticket.status
+
+            if update.status != ticket.status:
+                ticket.status = update.status
+                ticket.save()
+
+            update.save()
+
+        return render(request, self.template_name, {'ticket': ticket, 'form': form})
