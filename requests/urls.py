@@ -14,4 +14,10 @@ urlpatterns = [
     #user's tickets to be worked on
     url(r'^work/$', views.WorkView.as_view(), name='work'),
 
+    #create a ticket
+    url(r'^addticket/$', views.AddView.as_view(), name='addticket'),
+
+    #view tickets
+    url(r'^tickets/view/(?P<pk>[0-9]+)/$', views.TicketDetailView.as_view(), name='viewticket'),
+
 ]

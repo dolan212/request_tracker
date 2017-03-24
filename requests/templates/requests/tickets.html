@@ -3,6 +3,17 @@
 {% block work %}{% endblock %}
 
 {% block body %}
-<h1>Your Tickets</h1>
+    <h1>Your Tickets</h1>
+    <hr>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            {% for ticket in tickets %}
+                {% include 'requests/render_ticket.html' %}
+            {% endfor %}
+
+        </div>
+    </div>
 
 {% endblock %}

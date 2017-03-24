@@ -3,6 +3,31 @@
 {% block work %}active{% endblock %}
 
 {% block body %}
-<h1>Your Work</h1>
+    <div class="container-fluid">
+        <div class="container" style="width: 20%; float: left; overflow: hidden;">
+            <h2>Queues</h2>
+            <hr>
+            <ul class="nav nav-pills nav-stacked" style="max-height: 70vh;  overflow: auto;">
+                {% for  queue in queues %}
+                    <li><a data-toggle="pill" href="#{{ forloop.counter0 }}">{{ queue.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="container" style="width: 80%; float: right;">
+            <h2>Tickets</h2>
+            <div class="tab-content" style="max-height: 69vh;  overflow-y: auto; overflow-x: hidden;">
+                {% for queue in queues %}
+                    <div id="{{ forloop.counter0 }}" class="tab-pane fade in">
+                        <div class="row">
+                            {% for ticket in queue.ticket_set.all %}
+                                {% include 'requests/render_ticket.html' %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

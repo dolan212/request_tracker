@@ -1,0 +1,53 @@
+{% extends 'requests/base.html' %}
+
+{% block title %}View Ticket - {{ ticket.id }}{% endblock %}
+
+{% block body %}
+    <h1>Ticket {{ ticket.id }}</h1>
+    <h3><b>Subject:&nbsp;</b>{{ ticket.subject }} | <b>Created by:&nbsp;</b>{{ ticket.creator }} | <b>Status: </b> {{ ticket.get_status_display }}</h3>
+
+    <div class="container-fluid">
+    <button class="btn btn-primary" data-toggle="collapse" data-target="#update" style="margin: 10px; margin-left: 0px;">Update Ticket >></button>
+
+    <div class="panel panel-default collapse" id="update">
+        <div class="panel-body">
+            <form method="POST" action="">
+                {% csrf_token %}
+                {% include 'requests/form_template.html' %}
+                <button class="btn btn-success" type="submit" style="float: right;">Submit</button>
+            </form>
+        </div>
+    </div>
+    </div>
+
+    <div class="container-fluid">
+
+        {% for update in ticket.updates.all %}
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>{{ update.user }}</strong>
+                <span style="float:right;">
+                    <span class="label label-{{ update.get_lbtype }}">{{ update.get_status_display }}</span>
+                    {{ update.time }}
+                </span>
+            </div>
+            <div class="panel-body">
+                <p>{{ update.comment }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>{{ ticket.creator }}</strong>
+                <span style="float:right;">
+                    {{ ticket.time }}
+                </span>
+            </div>
+            <div class="panel-body">
+                <p>{{ ticket.description }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
