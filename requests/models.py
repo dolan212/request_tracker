@@ -9,6 +9,10 @@ class Queue(models.Model):
     creators = models.ManyToManyField(User, related_name='create_queues', blank=True)
     everybody = models.BooleanField(default=False)
 
+    def get_open_tickets(self):
+        tickets = self.ticket_set.all().exclude(status='C')
+        return tickets
+
     def __str__(self):
         return self.name
 
@@ -47,7 +51,7 @@ class Ticket(models.Model):
 
 class Update(models.Model):
     time = models.DateTimeField(auto_now=True)
-    comment = models.CharField(max_length=500)
+    comment = models.CharField(max_length=500, null=True, blank=True)
     status = models.CharField(max_length=1, choices=status_choices, blank=True)
     ticket = models.ForeignKey(Ticket, related_name='updates', on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True)

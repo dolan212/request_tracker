@@ -1,4 +1,7 @@
 {% extends 'requests/base.html' %}
+
+{% block title %}Tickets To Be Worked On{% endblock %}
+
 {% block yours %}{% endblock %}
 {% block work %}active{% endblock %}
 
@@ -20,7 +23,7 @@
                 {% for queue in queues %}
                     <div id="{{ forloop.counter0 }}" class="tab-pane fade in">
                         <div class="row">
-                            {% for ticket in queue.ticket_set.all %}
+                            {% for ticket in queue.get_open_tickets %}
                                 {% include 'requests/render_ticket.html' %}
                             {% endfor %}
                         </div>
