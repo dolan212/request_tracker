@@ -8,6 +8,7 @@ class Queue(models.Model):
     workers = models.ManyToManyField(User, related_name='work_queues', blank=True)
     creators = models.ManyToManyField(User, related_name='create_queues', blank=True)
     everybody = models.BooleanField(default=False)
+    mailbox = models.CharField(null=True, blank=True)
 
     def get_open_tickets(self):
         tickets = self.ticket_set.all().exclude(status='C')

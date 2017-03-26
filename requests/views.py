@@ -2,10 +2,12 @@ from itertools import chain
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views import generic
 
+from request_tracker import settings
 from requests.forms import UserForm, AddTicketForm, UpdateForm
 from requests.models import Queue, Ticket
 
@@ -102,11 +104,23 @@ class AddView(generic.FormView):
 
             ticket.save()
 
+            notify_workers(ticket)
+
             return redirect('requests:tickets')
 
         return render(request, self.template_name, {'form': form})
 
 
+def notify_workers(ticket):
+    worker_list = []
+    for u in ticket.queue.workers.all():
+        worker_list.append(u.email)
+
+    send_mail('New Ticket - [' + ticket.subject + ']',
+              'Problem description:\n' + ticket.description + "\nFrom queue: " + ticket.queue.__str__(),
+              settings.EMAIL_HOST_USER,
+              worker_list,
+              fail_silently=False)
 
 class TicketDetailView(generic.DetailView):
     model = Ticket

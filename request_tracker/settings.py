@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_cron',
 ]
 
 MIDDLEWARE = [
@@ -78,8 +79,12 @@ WSGI_APPLICATION = 'request_tracker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'request_tracker',
+        'USER': 'root',
+        'PASSWORD': '>crZwJ{a7wn!',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -121,3 +126,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CRON_CLASSES = [
+    'requests.get_email.Command',
+]
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'smith.liam221@gmail.com'
+EMAIL_HOST_PASSWORD = '8drN0m+}tt'
+EMAIL_USE_TLS = True
+
+MAILBOX_PATH = '/var/spool/mail'
