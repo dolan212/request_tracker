@@ -34,7 +34,7 @@ class Command(BaseCommand):
         process_email()
 
 def process_email():
-    for q in Queue.objects.filter(email_box_type__isnull=False):
+    for q in Queue.objects.exclude(mailbox=None):
         logger = logging.getLogger('django.requests.queue.' + q.name)
         logger.setLevel(logging.DEBUG)
         print "Processing queue " + q.name
@@ -83,13 +83,14 @@ def process_queue(q, logger):
 
    # elif email_box_type == 'local':
 
-    mbox = mailbox.mbox(settings.MAILBOX_PATH)
+    mailbox_path = join(settings.MAILBOX_PATH, q.mailbox)
+    mbox = mailbox.mbox(mailbox_path)
 
     logger.info("Found %d messages in local mailbox directory" % len(mbox))
     to_remove = []
     for key, message in mbox.iteritems():
         logger.info("Processing message %s" % key)
-        ticket = ticket_from_message(message=message, queue=q, logger=logger)
+        ticket = ticket_from_message(message=str(message), queue=q, logger=logger)
         if ticket:
             to_remove.append(key)
             logger.info("Successfully processed message %s, deleting" % key)
@@ -211,15 +212,21 @@ def ticket_from_message(message, queue, logger):
 
     if new:
         if sender_email:
-            send_mail('Ticket [' + str(t.id) + ']',
+            send_mail('Ticket [' + str(t.id) + '] - ' + t.subject,
                 'Your ticket has been created, and will be dealt with shortly.\nPlease reference your ticket number in square brackets "[' + str(t.id) + ']"'
-                + ' to update your ticket.',
+                + ' in the subject field to comment on your ticket.',
                 settings.EMAIL_HOST_USER,
                 [sender_email],
                 fail_silently=False
             )
 
         views.notify_workers(t)
+    if u.user.email is not sender_email:
+        send_mail('Ticket [' + str(t.id) + '] - ' + t.subject,
+                u.user.username + ":\n" + u.comment,
+                settings.EMAIL_HOST_USER,
+                [t.creator.email],
+                fail_silently=False)
 
     return t
 

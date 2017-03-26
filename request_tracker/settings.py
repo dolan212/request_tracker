@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_cron',
 ]
 
 MIDDLEWARE = [
@@ -137,4 +136,4 @@ EMAIL_HOST_USER = 'smith.liam221@gmail.com'
 EMAIL_HOST_PASSWORD = '8drN0m+}tt'
 EMAIL_USE_TLS = True
 
-MAILBOX_PATH = '/var/spool/mail'
+MAILBOX_PATH = '~/maildir/'

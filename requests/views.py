@@ -116,7 +116,7 @@ def notify_workers(ticket):
     for u in ticket.queue.workers.all():
         worker_list.append(u.email)
 
-    send_mail('New Ticket - [' + ticket.subject + ']',
+    send_mail('Ticket [' + str(ticket.id) + '] - ' + ticket.subject,
               'Problem description:\n' + ticket.description + "\nFrom queue: " + ticket.queue.__str__(),
               settings.EMAIL_HOST_USER,
               worker_list,
@@ -155,5 +155,11 @@ class TicketDetailView(generic.DetailView):
                 ticket.save()
 
             update.save()
+            if ticket.creator.email:
+                send_mail('Ticket [' + str(ticket.id) + '] - ' + ticket.subject,
+                        update.user.username + ":\n" +update.comment,
+                        settings.EMAIL_HOST_USER,
+                        [ticket.creator.email],
+                        fail_silently=False)
 
         return render(request, self.template_name, {'ticket': ticket, 'form': form})
