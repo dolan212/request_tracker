@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'request_tracker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
+        'NAME': 'request_tracker',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': '>crZwJ{a7wn!',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -126,10 +126,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-EMAIL_HOST = ''
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'smith.liam221@gmail.com'
+EMAIL_HOST_PASSWORD = '8drN0m+}tt'
 EMAIL_USE_TLS = True
-
-MAILBOX_PATH = '~/maildir/'

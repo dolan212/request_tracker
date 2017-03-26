@@ -8,7 +8,30 @@ class Queue(models.Model):
     workers = models.ManyToManyField(User, related_name='work_queues', blank=True)
     creators = models.ManyToManyField(User, related_name='create_queues', blank=True)
     everybody = models.BooleanField(default=False)
-    mailbox = models.CharField(max_length=50, null=True, blank=True)
+
+    def has_worker_rights(self, user):
+        try:
+            u = self.workers.get(pk=user.id)
+        except User.DoesNotExist:
+            return False
+        else:
+            if u:
+                return True
+            else:
+                return False
+
+    def has_creator_rights(self, user):
+        if self.everybody:
+            return True
+        try:
+            u = self.creators.get(pk=user.id)
+        except User.DoesNotExist:
+            return False
+        else:
+            if u:
+                return True
+            else:
+                return False
 
     def get_open_tickets(self):
         tickets = self.ticket_set.all().exclude(status='C')

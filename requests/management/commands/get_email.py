@@ -1,8 +1,6 @@
 import email
 import logging
-import mailbox
-from os import listdir, unlink
-from time import ctime
+from sys import stdin
 
 import re
 
@@ -12,7 +10,6 @@ from django.core.management import BaseCommand
 from django.utils.translation import ugettext as _
 from django.utils import six
 from email_reply_parser import EmailReplyParser
-from os.path import join, isfile
 
 from request_tracker import settings
 from requests import views
@@ -30,83 +27,49 @@ class Command(BaseCommand):
     def __init__(self):
         BaseCommand.__init__(self)
 
-    def handle(self, *args, **kwargs):
-        process_email()
+    # def add_arguments(self, parser):
+    #     parser.add_argument('message', type=str)
 
-def process_email():
-    for q in Queue.objects.exclude(mailbox=None):
-        logger = logging.getLogger('django.requests.queue.' + q.name)
-        logger.setLevel(logging.DEBUG)
-        print "Processing queue " + q.name
-        process_queue(q, logger=logger)
+    def handle(self, *args, **options):
+        msg = stdin.read()
+        #print options['message']
+        process_email(msg=msg)
+
+def process_email(msg):
+    q = Queue.objects.filter(everybody=True).first()
+    logger = logging.getLogger('django.requests.queue.' + q.name)
+    logger.setLevel(logging.DEBUG)
+    process_queue(q=q, message=msg, logger=logger)
 
 
-def process_queue(q, logger):
-    logger.info("**** %s: Begin processing mail for requests" % ctime())
-
-    # email_box_type = settings.QUEUE_EMAIL_BOX_TYPE or q.email_box_type
+def process_queue(q, message, logger):
+    ticket_from_message(message=message, queue=q, logger=logger)
+    # logger.info("**** %s: Begin processing mail for requests" % ctime())
     #
-    # if email_box_type == 'pop3':
-    #     server = poplib.POP3_SSL(q.email_box_host or settings.QUEUE_EMAIL_BOX_HOST, int(q.email_box_port))
+    # mailbox_path = join(settings.MAILBOX_PATH, q.mailbox)
+    # mbox = mailbox.mbox(mailbox_path)
     #
-    #     print ("Attempting POP3 server login")
-    #     server.getwelcome()
-    #     server.user(q.email_box_user or settings.QUEUE_EMAIL_BOX_USER)
-    #     server.pass_(q.email_box_password or settings.QUEUE_EMAIL_BOX_PASSWORD)
+    # logger.info("Found %d messages in local mailbox directory" % len(mbox))
+    # to_remove = []
+    # for key, message in mbox.iteritems():
+    #     logger.info("Processing message %s" % key)
+    #     ticket = ticket_from_message(message=str(message), queue=q, logger=logger)
+    #     if ticket:
+    #         to_remove.append(key)
+    #         logger.info("Successfully processed message %s, deleting" % key)
+    #     else:
+    #         logger.warn("Could not process message %s, leaving in mbox" % key)
     #
-    #     messagesInfo = server.list()[1]
-    #     print ("Received %d messages from POP3 server" % len(messagesInfo))
-    #
-    #     for msg in messagesInfo:
-    #         msgNum = msg.split(" ")[0]
-    #         logger.info("Processing message %s" % msgNum)
-    #
-    #         full_message = "\n".join(server.retr(msgNum)[1])
-    #         ticket = ticket_from_message(message=full_message, queue=q, logger=logger)
-    #
-    #         if ticket:
-    #             server.dele(msgNum)
-    #             logger.info("Successfully processed message %s, deleted from POP3 server" % msgNum)
-    #         else:
-    #             logger.warn("Message %s was not successfully processed, and will be left on POP3 server" % msgNum)
-    #
-    #     server.quit()
-    #
-    # elif email_box_type == 'imap':
-    #     server = imaplib.IMAP4_SSL(q.email_box_host or settings.QUEUE_EMAIL_BOX_HOST, int(q.email_box_port))
-    #
-    #     logger.info("Attempting IMAP server login")
-    #
-    #     server.login(q.email_box_user or settings.QUEUE_EMAIL_BOX_USER,
-    #                  q.email_box_password or settings.QUEUE_EMAIL_BOX_PASSWORD)
-    #     #pray that box type isn't IMAP
-
-   # elif email_box_type == 'local':
-
-    mailbox_path = join(settings.MAILBOX_PATH, q.mailbox)
-    mbox = mailbox.mbox(mailbox_path)
-
-    logger.info("Found %d messages in local mailbox directory" % len(mbox))
-    to_remove = []
-    for key, message in mbox.iteritems():
-        logger.info("Processing message %s" % key)
-        ticket = ticket_from_message(message=str(message), queue=q, logger=logger)
-        if ticket:
-            to_remove.append(key)
-            logger.info("Successfully processed message %s, deleting" % key)
-        else:
-            logger.warn("Could not process message %s, leaving in mbox" % key)
-
-    mbox.lock()
-    try:
-        for key in to_remove:
-            mbox.remove(key)
-        mbox.flush()
-    except:
-        logger.error("Could not delete messages from mbox")
-    finally:
-        mbox.close()
-        mbox.unlock()
+    # mbox.lock()
+    # try:
+    #     for key in to_remove:
+    #         mbox.remove(key)
+    #     mbox.flush()
+    # except:
+    #     logger.error("Could not delete messages from mbox")
+    # finally:
+    #     mbox.close()
+    #     mbox.unlock()
 
 def decodeUnknown(charset, string):
     if six.PY2:
@@ -198,9 +161,6 @@ def ticket_from_message(message, queue, logger):
         user.save()
 
 
-
-
-
     if ticket is None:
         new = True
         t = Ticket.objects.create(subject=subject, queue=queue, description=body, creator=user)
@@ -221,7 +181,7 @@ def ticket_from_message(message, queue, logger):
             )
 
         views.notify_workers(t)
-    if u.user.email is not sender_email:
+    elif u.user.email is not sender_email:
         send_mail('Ticket [' + str(t.id) + '] - ' + t.subject,
                 u.user.username + ":\n" + u.comment,
                 settings.EMAIL_HOST_USER,
