@@ -8,14 +8,14 @@
             </span>
         </div>
 
-        <div class="panel-body">
+        <div class="panel-body" style="height: 150px; overflow: auto;">
             <h3>{{ ticket.subject }}</h3>
             <p>{{ ticket.description }}</p>
         </div>
 
         <div class="panel-footer" style="text-align: right;">
             <a href="{% url 'requests:viewticket' ticket.id %}">
-                <button class="btn btn-primary">
+                <button class="btn btn-primary">gedit
                     View Ticket >>
                 </button>
             </a>
